@@ -1,0 +1,70 @@
+NAME :=	libpngimg.a
+
+PREFIX ?= @PREFIX@
+INCLUDE_DIR := $(PREFIX)/include/
+LIB_DIR := $(PREFIX)/lib/
+
+RM ?= rm -f
+
+CXX ?=	g++
+CXXFLAGS ?=	-O2
+# CXXFLAGS +=	-Wextra
+CXXFLAGS +=	-Wall -Wno-unknown-pragmas
+DFLAGS =	-MMD -MF $(DEP_DIR)$*.d
+AR ?=	ar
+ARFLAGS :=	rcs
+
+SRC =	$(SRC_FILE:%.cpp=$(SRC_DIR)%.cpp)
+SRC_DIR :=	src/
+SRC_FILE :=	png.cpp	pngFile.cpp	pngImageChunk.cpp
+
+TEST =	$(TEST_MAIN:%.cpp=$(TEST_DIR)%.cpp)
+TEST_TAR =	$(TEST_DIR)test.out
+TEST_DIR :=	test/
+TEST_MAIN :=	main.cpp
+
+OBJ =	$(SRC:$(SRC_DIR)%.cpp=$(OBJ_DIR)%.o)
+OBJ_DIR :=	obj/
+
+DEP =	$(SRC:$(SRC_DIR)%.cpp=$(DEP_DIR)%.d)
+DEP_DIR :=	dep/
+
+HDR =	$(HDR_FILE:%.hpp=$(HDR_DIR)%.hpp)
+HDR_DIR :=	include/
+HDR_FILE :=	pngimg.hpp
+
+all: $(NAME)
+
+$(DEP_DIR) $(OBJ_DIR) $(INCLUDE_DIR) $(LIB_DIR):
+	mkdir -p $@
+
+$(NAME): $(OBJ)
+	$(AR) $(ARFLAGS) $@ $^
+
+$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp | $(DEP_DIR) $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) $(DFLAGS) -c $< -o $@
+-include $(DEP)
+
+install: $(NAME) | $(INCLUDE_DIR) $(LIB_DIR)
+	install -m 644	$(HDR)	$(INCLUDE_DIR)
+	install -m 644	$(NAME)	$(LIB_DIR)
+
+test:
+	$(CXX) $(CXXFLAGS) $(TEST) -lpngimg -lz -o $(TEST_TAR)
+	./$(TEST_TAR)
+
+clean:
+	$(RM) $(OBJ) $(DEP)
+	$(RM) $(TEST_DIR)test-*.png
+
+fclean:	clean
+	rmdir $(OBJ_DIR)
+	rmdir $(DEP_DIR)
+	$(RM) $(NAME)
+	$(RM) $(TEST_TAR)
+
+uninstall:
+	rm $(INCLUDE_DIR)/$(HDR_FILE)
+	rm $(LIB_DIR)/$(NAME)
+
+.PHONY: all test install clean fclean uninstall

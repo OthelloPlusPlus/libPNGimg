@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# default
+PREFIX=/usr/local
+
+# parse command line
+for arg in "$@"; do
+    case $arg in
+        --prefix=*)
+            PREFIX="${arg#*=}"
+            ;;
+    esac
+done
+
+# generate Makefile with correct prefix
+echo "Configuring with prefix: $PREFIX"
+sed "s|@PREFIX@|$PREFIX|g" Makefile.in > Makefile
+
+echo "Done."

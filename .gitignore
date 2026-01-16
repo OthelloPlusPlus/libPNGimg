@@ -1,0 +1,10 @@
+# Build artifacts
+Makefile
+obj/
+dep/
+*.o
+*.a
+*.so
+*.out
+test/test-*.png
+.vscode/
