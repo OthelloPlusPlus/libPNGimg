@@ -105,8 +105,14 @@ void	image::unsetBackgroundColor()
 	this->backgroundColor = nullptr;
 }
 
-void	image::setColorType(ColorType	type)
+void	image::setColorType(ColorType type)
 {
+	if (this->colorType == ColorType::PALETTE)
+	{
+		#warning Palette is unhandled
+		std::cerr	<< "Palette is unhandled"	<< std::endl;
+		return ;
+	}
 	this->colorType = type;
 	this->calculateChannels();
 	this->setBitDepth(this->bitDepth);
