@@ -6,6 +6,12 @@
 #include <ctime>	// std::time
 #include <sys/utsname.h>	// utsname
 
+#include <cmath>
+
+// #ifdef DEBUG
+# include <iomanip>
+// #endif
+
 #ifndef SOFTWARENAME
 # define SOFTWARENAME	"libPNG"
 #endif
@@ -38,6 +44,11 @@ tm	getUTC()
 	return (utc);
 }
 
+// double	RamanunjanIIEllipseFormula(double radiusA, double radiusB)
+// {
+// 	double h = std::pow(radiusA - radiusB, 2) / std::pow(radiusA + radiusB, 2);
+// 	return (M_PI * (radiusA + radiusB) * (1 + (3 * h) / (10 + std::sqrt(4 - 3 * h))));
+// }
 
 }
 
@@ -215,6 +226,116 @@ void	image::printMetaData()
 }
 
 // #endif
+
+
+
+void	image::drawLine(const std::vector<std::pair<int, int>> line, rgba color)
+{
+	std::vector<std::pair<int, int>>::const_iterator	prev = line.begin();
+	for (std::vector<std::pair<int, int>>::const_iterator crnt = line.begin(); crnt != line.end(); ++crnt)
+	{
+		// this->drawLineSegment(*prev, *crnt, color);
+		this->drawLine(prev->first, prev->second, crnt->first, crnt->second, color);
+		prev = crnt;	
+	}
+}
+
+void	image::drawLine(int xStart, int yStart, int xEnd, int yEnd, rgba color)
+{
+	double	dX = xEnd - xStart;
+	double	dY = yEnd - yStart;
+	int		steps = std::max(std::abs(dX), std::abs(dY));
+	if (steps > 0)
+	{
+		dX /= steps;
+		dY /= steps;
+	}
+
+	for (int i = 0; i <= steps; ++i)
+	{
+		int	x = std::round(xStart + dX * i);
+		int	y = std::round(yStart + dY * i);
+		this->pixels[x][y] = color;
+	}
+}
+
+void	image::drawShape(const std::vector<std::pair<int, int>> shape, rgba color)
+{
+	this->drawLine(shape, color);
+	auto	begin = *shape.begin();
+	auto	end = *shape.rbegin();
+	this->drawLine(end.first, end.second, begin.first, begin.second, color);
+}
+
+void	image::drawEllipse(int xBegin, int yBegin, int xEnd, int yEnd, rgba color)
+{
+	// Calculate Center coordinates and Radii
+	if (xBegin > xEnd)
+		std::swap(xBegin, xEnd);
+	double	xRadius = (xEnd - xBegin) / 2.0;
+	double	xCenter = xBegin + xRadius;
+	if (yBegin > yEnd)
+		std::swap(yBegin, yEnd);
+	double	yRadius = (yEnd - yBegin) / 2.0;
+	double	yCenter = yBegin + yRadius;
+
+	this->drawEllipse(xCenter, xRadius, yCenter, yRadius, color);
+
+	// // Calculate amount of points and sub-angles
+	// int		points = (xEnd - xBegin + yEnd - yBegin);
+	// double	angle = M_PI / points * 2;
+
+	// // Generate Ellipse
+	// std::vector<std::pair<int, int>>	ellipse;
+	// for (int i = 0; i < points; ++i)
+	// {
+	// 	int	x = std::round(xCenter + xRadius * std::cos(i * angle));
+	// 	int	y = std::round(yCenter + yRadius * std::sin(i * angle));
+	// 	// this->pixels[x][y] = {255, 0, 0};
+	// 	ellipse.push_back({x, y});
+	// }
+	// // Draw Ellipse
+	// this->drawShape(ellipse, color);
+}
+
+void	image::drawEllipse(double xCenter, double xRadius, double yCenter, double yRadius, rgba color)
+{
+	std::vector<std::pair<int, int>>	ellipse;
+	int	points = int(xRadius + yRadius) * 32;
+	if (points <= 0)
+		points = 1;
+	double	angle = M_PI / points * 2;
+	for (int i = 0; i < points; ++i)
+	{
+		ellipse.push_back({
+			std::round(xCenter + xRadius * std::cos(i * angle)),
+			std::round(yCenter + yRadius * std::sin(i * angle))
+		});
+	}
+	this->drawShape(ellipse, color);
+}
+
+
+
+// void	image::drawLineSegment(std::pair<int, int> start, std::pair<int, int> end, rgba& color)
+// {
+// 	double	dX = end.first - start.first;
+// 	double	dY = end.second - start.second;
+// 	int		steps = std::max(std::abs(dX), std::abs(dY));
+// 	if (steps > 0)
+// 	{
+// 		dX /= steps;
+// 		dY /= steps;
+// 	}
+
+// 	for (int i = 0; i <= steps; ++i)
+// 	{
+// 		int	x = std::round(start.first + dX * i);
+// 		int	y = std::round(start.second + dY * i);
+// 		this->pixels[x][y] = color;
+// 	}
+// }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -466,6 +587,10 @@ bool	image::save(const char* name)
 
 void	image::createPrintableImage()
 {
+	// Validate size
+	if (this->pixels.size() == 0)
+		throw std::runtime_error("No pixels set");
+
 	// copy map
 	this->printMap = this->pixels;
 
@@ -481,6 +606,7 @@ void	image::createPrintableImage()
 		newVal = i->second.rbegin()->first;
 		yHigh = newVal > yHigh ? newVal : yHigh;
 	}
+
 	// fill unset pixels with backgroundcolor
 	for (int x = xLow; x <= xHigh; ++x)
 	{
@@ -706,12 +832,12 @@ std::vector<uint8_t>	image::IDAT_CompressData(std::vector<uint8_t>& data)
 	return (compressed);
 }
 
-#ifdef DEBUG
-# include <iomanip>
+// #ifdef DEBUG
+// # include <iomanip>
 
 void	image::printBuffer(const uint8_t* buffer, unsigned int size)
 {
-	unsigned short line = 1 + (this->printMap.size() * int(this->bitDepth) + 7) / 8;
+	unsigned int line = 1 + (this->printMap.size() * int(this->bitDepth) + 7) / 8;
 	for (unsigned int i = 0; i < size; ++i)
 	{
 		for (short bit = 7; bit >= 0; --bit)
@@ -724,7 +850,19 @@ void	image::printBuffer(const uint8_t* buffer, unsigned int size)
 			std::cout	<< ' ';
 	}
 }
-#endif
+
+void	image::printPixelMap()
+{
+	for (auto i = this->pixels.begin(); i != this->pixels.end(); ++i)
+	{
+		for (auto j = i->second.begin(); j != i->second.end(); ++j)
+			std::cout	<< '['	<< i->first	<< ']'
+						<< '['	<< j->first	<< ']'
+						<< '\n';
+	}
+	std::cout	<< std::flush;
+}
+// #endif
 
 void	image::tIME_Save(std::fstream& file)
 {

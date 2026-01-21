@@ -6,7 +6,7 @@
 /*   By: ohengelm <ohengelm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 14:24:34 by ohengelm          #+#    #+#             */
-/*   Updated: 2026/01/16 21:03:10 by ohengelm         ###   ########.fr       */
+/*   Updated: 2026/01/21 20:05:15 by ohengelm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <fstream>	// std::fstream
 # include <map>	// std::map
 # include <vector>	// std::vector
+# include <queue>	// std::queue
 // # include <zlib.h>	// crc32(uLongf)
 
 namespace png
@@ -92,6 +93,26 @@ class image
 		void	clearMetaData();
 
 		std::map<int, rgba>&	operator[](int x) {return this->pixels[x];}
+		void	drawLine(int xStart, int yStart, int xEnd, int yEnd, rgba color);
+		void	drawLine(const std::vector<std::pair<int, int>> line, rgba color);
+		void	drawShape(const std::vector<std::pair<int, int>> shape, rgba color);
+		void	drawEllipse(int xBegin, int yBegin, int xEnd, int yEnd, rgba color);
+		void	drawEllipse(double xCenter, double xRadius, double yCenter, double yRadius, rgba color);
+
+		// void	drawLineSegment(std::pair<int, int> start, std::pair<int, int> end, rgba &color);
+
+		// void	drawShape(std::queue<int, int> shape, rgba border, rgba content);
+		// void	setLineColor(rgba color);
+		// void	startNewLine(int x, int y);
+		// void	addLinePoint(int x, int y);
+		// void	drawLine();
+		// void	clearLine();
+		// void	setShapeBorderColor(rgba color);
+		// void	setShapeContentColor(rgba color);
+		// void	startNewShape(int x, int y);
+		// void	addShapePoint(int x, int y);
+		// void	drawShape();
+		// void	clearShape();
 
 		bool	save(const char* name);
 		bool	load(const char* name);
@@ -108,6 +129,12 @@ class image
 
 		std::map<int, std::map<int, rgba>>	pixels;
 		std::map<int, std::map<int, rgba>>	printMap;
+
+		// std::queue<int, int>	line;
+		// rgba					lineColor;
+		// std::queue<int, int>	shape;
+		// rgba					shapeBorderColor;
+		// rgba					shapeContentColor;
 
 		void	calculateChannels();
 
@@ -161,6 +188,7 @@ class image
 		unsigned short	convertColorToGray(const rgba col);
 // #ifdef DEBUG
 		void	printBuffer(const uint8_t* buffer, unsigned int size);
+		void	printPixelMap();
 		void	printMetaData();
 // #endif
 		uint8_t		bitsPerPixel();

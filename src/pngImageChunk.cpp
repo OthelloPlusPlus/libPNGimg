@@ -52,6 +52,7 @@ std::vector<uint8_t>	image::Chunk::readFrom_NBytes(std::fstream& file, uint32_t 
 
 void	image::Chunk::writeTo(std::fstream& file) const
 {
+	// std::cout	<< "Saving "	<< std::string(this->type, 4)	<< std::endl;
 	Chunk::writeUint32To(file, this->data.size());
 	file.write(this->type, 4);
 	file.write(reinterpret_cast<const char*>(this->data.data()), this->data.size());
