@@ -1,10 +1,13 @@
-# Build artifacts
+# VSC directory
+.vscode/
+# Makefile is generated through configure/Makefile.in
 Makefile
+# Build artifacts
 obj/
 dep/
 *.o
 *.a
 *.so
 *.out
+# Test images
 test/test-*.png
-.vscode/
