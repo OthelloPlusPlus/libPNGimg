@@ -267,6 +267,12 @@ void	image::drawShape(const std::vector<std::pair<int, int>> shape, rgba color)
 	this->drawLine(end.first, end.second, begin.first, begin.second, color);
 }
 
+void	image::drawShape(const std::vector<std::pair<int, int>> shape, rgba color, rgba fill)
+{
+# warning add fill by passing horizontal lines
+	this->drawShape(shape, color);
+}
+
 void	image::drawEllipse(int xBegin, int yBegin, int xEnd, int yEnd, rgba color)
 {
 	// Calculate Center coordinates and Radii
@@ -280,22 +286,6 @@ void	image::drawEllipse(int xBegin, int yBegin, int xEnd, int yEnd, rgba color)
 	double	yCenter = yBegin + yRadius;
 
 	this->drawEllipse(xCenter, xRadius, yCenter, yRadius, color);
-
-	// // Calculate amount of points and sub-angles
-	// int		points = (xEnd - xBegin + yEnd - yBegin);
-	// double	angle = M_PI / points * 2;
-
-	// // Generate Ellipse
-	// std::vector<std::pair<int, int>>	ellipse;
-	// for (int i = 0; i < points; ++i)
-	// {
-	// 	int	x = std::round(xCenter + xRadius * std::cos(i * angle));
-	// 	int	y = std::round(yCenter + yRadius * std::sin(i * angle));
-	// 	// this->pixels[x][y] = {255, 0, 0};
-	// 	ellipse.push_back({x, y});
-	// }
-	// // Draw Ellipse
-	// this->drawShape(ellipse, color);
 }
 
 void	image::drawEllipse(double xCenter, double xRadius, double yCenter, double yRadius, rgba color)
@@ -314,28 +304,6 @@ void	image::drawEllipse(double xCenter, double xRadius, double yCenter, double y
 	}
 	this->drawShape(ellipse, color);
 }
-
-
-
-// void	image::drawLineSegment(std::pair<int, int> start, std::pair<int, int> end, rgba& color)
-// {
-// 	double	dX = end.first - start.first;
-// 	double	dY = end.second - start.second;
-// 	int		steps = std::max(std::abs(dX), std::abs(dY));
-// 	if (steps > 0)
-// 	{
-// 		dX /= steps;
-// 		dY /= steps;
-// 	}
-
-// 	for (int i = 0; i <= steps; ++i)
-// 	{
-// 		int	x = std::round(start.first + dX * i);
-// 		int	y = std::round(start.second + dY * i);
-// 		this->pixels[x][y] = color;
-// 	}
-// }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
