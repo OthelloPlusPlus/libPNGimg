@@ -6,7 +6,7 @@
 /*   By: ohengelm <ohengelm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 14:24:34 by ohengelm          #+#    #+#             */
-/*   Updated: 2026/01/21 21:04:09 by ohengelm         ###   ########.fr       */
+/*   Updated: 2026/02/05 18:27:51 by ohengelm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,19 +138,19 @@ class image
 		void		IHDR_SetData(std::vector<uint8_t>& data);
 		void	IHDR_Load(const uint8_t data[13]);
 
-		void	cHRM_Save(std::fstream& file) {};
-		void	gAMA_Save(std::fstream& file) {};
-		void	iCCP_Save(std::fstream& file) {};
-		void	sBIT_Save(std::fstream& file) {};
-		void	sRGB_Save(std::fstream& file) {};
-		void	PLTE_Save(std::fstream& file) {};
-		void	pHYs_Save(std::fstream& file) {};
-		void	sPLT_Save(std::fstream& file) {};
-		void	tRNS_Save(std::fstream& file) {};
+		void	cHRM_Save(std::fstream& file) {(void)file;};
+		void	gAMA_Save(std::fstream& file) {(void)file;};
+		void	iCCP_Save(std::fstream& file) {(void)file;};
+		void	sBIT_Save(std::fstream& file) {(void)file;};
+		void	sRGB_Save(std::fstream& file) {(void)file;};
+		void	PLTE_Save(std::fstream& file) {(void)file;};
+		void	pHYs_Save(std::fstream& file) {(void)file;};
+		void	sPLT_Save(std::fstream& file) {(void)file;};
+		void	tRNS_Save(std::fstream& file) {(void)file;};
 
 		void	bKGD_Save(std::fstream& file);
 
-		void	hIST_Save(std::fstream& file) {};
+		void	hIST_Save(std::fstream& file) {(void)file;};
 
 
 		void	IDAT_Save(std::fstream& file);
