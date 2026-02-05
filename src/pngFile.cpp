@@ -55,6 +55,8 @@ std::string	image::File::generateName(std::size_t pos)
 
 	if (pos != std::string::npos)
 		name = this->path.substr(pos + 1);
+	else
+		name = this->path;
 
 	if (!this-> nameHasValidExtension(name, ".png"))
 	{
